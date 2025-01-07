@@ -5,7 +5,7 @@ contract MedicalSystem {
     uint public recordId;
     struct Doctor {
         string name;
-        address[] patients;
+        Patient[] patients;
     }
 
     struct Patient {
@@ -156,7 +156,7 @@ contract MedicalSystem {
         );
 
         patients[msg.sender].authorizedDoctors.push(_doctor);
-        doctors[_doctor].patients.push(msg.sender);
+        doctors[_doctor].patients.push(patients[msg.sender]);
 
         emit DoctorAuthorized(msg.sender, _doctor);
     }
@@ -214,7 +214,7 @@ contract MedicalSystem {
         external
         view
         onlyRegisteredDoctor(msg.sender)
-        returns (address[] memory)
+        returns (Patient[] memory)
     {
         return doctors[msg.sender].patients;
     }
@@ -260,7 +260,7 @@ contract MedicalSystem {
             "Record does not exist"
         );
 
-        uint _recordId = patients[msg.sender].records[_recordIndex].recordId;
+        uint _recordId = patients[_patient].records[_recordIndex].recordId;
         return attachments[_recordId];
     }
 }
