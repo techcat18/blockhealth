@@ -45,23 +45,32 @@ export const App = observer(() => {
     <Suspense fallback={<Dots />}>
       <Routes>
         <Route index element={<Index userRole={userRole} />} />
-        <Route path="register" element={<Register />} />
+        <Route
+          path="register"
+          element={
+            <PrivateRoute isAllowed={userRole == "unregistered"} redirect="/">
+              <Register />
+            </PrivateRoute>
+          }
+        />
+
         <Route
           path="doctor"
           element={
             <PrivateRoute
               isAllowed={userRole == "doctor"}
-              redirect={location.state?.from}
+              redirect={location.state?.from || "/"}
             >
               <DoctorDashboard />
             </PrivateRoute>
           }
         />
         <Route
+          path="patient"
           element={
             <PrivateRoute
               isAllowed={userRole == "patient"}
-              redirect={location.state?.from}
+              redirect={location.state?.from || "/"}
             >
               <PatientDashboard />
             </PrivateRoute>

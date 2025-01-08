@@ -1,9 +1,9 @@
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
 const MedicalSystemModule = buildModule("MedicalSystemModule", (m) => {
-  const lock = m.contract("MedicalSystem");
+  const medicalSystem = m.contract("MedicalSystem");
 
-  return { lock };
+  return { medicalSystem };
 });
 
 export default MedicalSystemModule;

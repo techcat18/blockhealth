@@ -1,14 +1,12 @@
 import { useField } from "formik";
-import { InputHTMLAttributes } from "react";
+import InputMask from "react-input-mask";
 
-type InputProps = InputHTMLAttributes<HTMLInputElement>;
-
-interface Props extends Omit<InputProps, "name" | "className"> {
+interface Props {
   name: string;
   label: string;
 }
 
-export const InputField = ({ name, label, ...props }: Props) => {
+export const DateField = ({ name, label }: Props) => {
   const [field, meta] = useField(name);
 
   return (
@@ -25,9 +23,10 @@ export const InputField = ({ name, label, ...props }: Props) => {
         </div>
       )}
       <div className="mt-2">
-        <input
-          {...props}
+        <InputMask
           {...field}
+          mask="99.99.9999"
+          placeholder="DD/MM/YYYY"
           className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
         />
       </div>

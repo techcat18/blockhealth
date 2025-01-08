@@ -6,7 +6,7 @@ import {
 } from "@headlessui/react";
 import { ChevronUpDownIcon } from "@heroicons/react/16/solid";
 import { CheckIcon } from "@heroicons/react/20/solid";
-import { useField } from "formik";
+import { useField, useFormikContext } from "formik";
 
 interface Props {
   name: string;
@@ -21,9 +21,10 @@ export type SelectOption = {
 
 export const SelectField = ({ name, label, selectOptions }: Props) => {
   const [field] = useField(name);
+  const { setFieldValue } = useFormikContext();
 
   return (
-    <Listbox value={field.value} onChange={field.onChange}>
+    <Listbox value={field.value} onChange={(val) => setFieldValue(name, val)}>
       <label
         htmlFor={name}
         className="block text-sm font-medium leading-6 text-gray-900"

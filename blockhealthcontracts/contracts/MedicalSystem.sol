@@ -108,7 +108,7 @@ contract MedicalSystem {
         _;
     }
 
-    function getUserRole(address _user) public view returns (string memory) {
+    function getUserRole(address _user) external view returns (string memory) {
         if (isRegisteredDoctor(_user)) {
             return "Doctor";
         } else if (isRegisteredPatient(_user)) {
