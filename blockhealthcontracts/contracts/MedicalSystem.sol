@@ -1,6 +1,7 @@
 //SPDX-Licence-Identifier:MIT
 pragma solidity ^0.8.0;
 
+// Author: @techcat18 dimaniko04
 contract MedicalSystem {
     uint public recordId;
     struct Doctor {
