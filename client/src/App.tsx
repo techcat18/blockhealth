@@ -11,11 +11,13 @@ import { PatientDashboard } from "./pages/PatientDashboard";
 
 import { Dots } from "./component/Loaders";
 import { PrivateRoute } from "./component/PrivateRoute";
+import { SnackBar } from "./component/SnackBar";
 
 export const App = observer(() => {
   const location = useLocation();
-  const { loadBlockchainData, account, state, error, userRole } =
-    useStoreContext();
+  const {
+    contractStore: { loadBlockchainData, account, state, error, userRole },
+  } = useStoreContext();
 
   useEffect(() => {
     loadBlockchainData();
@@ -77,6 +79,7 @@ export const App = observer(() => {
           }
         />
       </Routes>
+      <SnackBar />
     </Suspense>
   );
 });

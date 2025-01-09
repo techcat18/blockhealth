@@ -13,10 +13,12 @@ interface Props {
 
 export const RegisterForm = observer(({ mode }: Props) => {
   const {
-    registerDoctor,
-    registerPatient,
-    registrationError,
-    isRegistrationRequested,
+    contractStore: {
+      registerDoctor,
+      registerPatient,
+      registrationError,
+      isRegistrationRequested,
+    },
   } = useStoreContext();
   const initialValues = {
     name: "",
@@ -37,6 +39,7 @@ export const RegisterForm = observer(({ mode }: Props) => {
             return;
           }
           await registerPatient({
+            addr: "",
             ...values,
           });
         } finally {

@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = "0xac1Cf68fbDDb8FC18e9c47d120009FB65c2C14d8";
+export const CONTRACT_ADDRESS = "0x28417743b77f72C763aCAda68DDd3b486a6FC78A";
 
 export const CONTRACT_ABI = [
   {
@@ -254,6 +254,11 @@ export const CONTRACT_ABI = [
             type: "string",
           },
           {
+            internalType: "address",
+            name: "addr",
+            type: "address",
+          },
+          {
             internalType: "enum MedicalSystem.Gender",
             name: "gender",
             type: "uint8",
@@ -399,6 +404,11 @@ export const CONTRACT_ABI = [
         internalType: "string",
         name: "name",
         type: "string",
+      },
+      {
+        internalType: "address",
+        name: "addr",
+        type: "address",
       },
       {
         internalType: "enum MedicalSystem.Gender",

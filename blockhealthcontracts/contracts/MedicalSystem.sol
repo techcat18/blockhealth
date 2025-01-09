@@ -11,6 +11,7 @@ contract MedicalSystem {
 
     struct Patient {
         string name;
+        address addr;
         Gender gender;
         uint256 birthDate;
         MedicalRecord[] records;
@@ -141,6 +142,7 @@ contract MedicalSystem {
         );
 
         Patient storage patient = patients[msg.sender];
+        patient.addr = msg.sender;
         patient.name = _name;
         patient.gender = _gender;
         patient.birthDate = _birthDate;

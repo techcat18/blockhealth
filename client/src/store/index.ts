@@ -1,8 +1,8 @@
 import { createContext, useContext } from "react";
-import { ContractStore } from "./ContractStore";
+import { RootStore } from "./RootStore";
 
-export default ContractStore;
+export default RootStore;
 
-export const StoreContext = createContext<ContractStore>({} as ContractStore);
+export const StoreContext = createContext<RootStore>({} as RootStore);
 
-export const useStoreContext = (): ContractStore => useContext(StoreContext);
+export const useStoreContext = (): RootStore => useContext(StoreContext);
