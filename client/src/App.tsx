@@ -12,6 +12,7 @@ import { PatientDashboard } from "./pages/PatientDashboard";
 import { Dots } from "./component/Loaders";
 import { PrivateRoute } from "./component/PrivateRoute";
 import { SnackBar } from "./component/SnackBar";
+import { PatientDetails } from "./pages/PatientDetails";
 
 export const App = observer(() => {
   const location = useLocation();
@@ -62,11 +63,12 @@ export const App = observer(() => {
             <PrivateRoute
               isAllowed={userRole == "doctor"}
               redirect={location.state?.from || "/"}
-            >
-              <DoctorDashboard />
-            </PrivateRoute>
+            />
           }
-        />
+        >
+          <Route index element={<DoctorDashboard />} />
+          <Route path=":address" element={<PatientDetails />} />
+        </Route>
         <Route
           path="patient"
           element={

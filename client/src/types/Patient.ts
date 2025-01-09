@@ -4,5 +4,5 @@ export type Patient = {
   name: string;
   addr: string;
   gender: Gender;
-  birthdate: string;
+  birthDate: string;
 };

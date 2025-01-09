@@ -7,3 +7,5 @@ export type MedicalRecord = {
   description: string;
   attachments: Attachment[];
 };
+
+export type MedicalRecordWithIndex = MedicalRecord & { index: number };

@@ -4,12 +4,16 @@ import { Dots } from "../Loaders";
 import { DashboardError } from "../DashboardError";
 import { NoData } from "../NoData";
 import { observer } from "mobx-react";
+import { Patient } from "../../types/Patient";
 
-export const MedicalRecordsList = observer(() => {
+interface Props {
+  patient?: Patient;
+}
+
+export const MedicalRecordsList = observer(({ patient }: Props) => {
   const {
     contractStore: {
       medicalRecords,
-      selectedPatient,
       fetchOwnMedicalRecords,
       fetchPatientMedicalRecords,
       isFetching,
@@ -18,13 +22,13 @@ export const MedicalRecordsList = observer(() => {
   } = useStoreContext();
 
   useEffect(() => {
-    if (selectedPatient) {
-      fetchPatientMedicalRecords(selectedPatient.addr);
+    if (patient) {
+      fetchPatientMedicalRecords(patient.addr);
     } else {
       fetchOwnMedicalRecords();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedPatient]);
+  }, [patient]);
 
   if (isFetching) {
     return <Dots />;
@@ -47,7 +51,15 @@ export const MedicalRecordsList = observer(() => {
             </div>
             <button className="text-blue-500 underline">Expand</button>
           </div>
-          {true && (
+        </li>
+      ))}
+    </ul>
+  );
+});
+
+/* 
+
+{true && (
             <div className="mt-4">
               <h4 className="font-medium">Attachments:</h4>
               <ul className="mt-2 mb-4">
@@ -65,15 +77,11 @@ export const MedicalRecordsList = observer(() => {
                   )
                 )}
               </ul>
-              {!selectedPatient && (
+              {!patient && (
                 <button className="bg-green-500 text-white px-4 py-1 rounded">
                   Add Attachment
                 </button>
               )}
             </div>
           )}
-        </li>
-      ))}
-    </ul>
-  );
-});
+*/

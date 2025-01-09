@@ -4,10 +4,11 @@ import { CONTRACT_ABI, CONTRACT_ADDRESS } from "../../web3/constants";
 import { UserRole } from "../types/UserRole";
 import { Doctor } from "../types/Doctor";
 import { Patient } from "../types/Patient";
-import { parse } from "date-fns";
-import { MedicalRecord } from "../types/MedicalRecord";
+import { format, parse } from "date-fns";
+import { MedicalRecord, MedicalRecordWithIndex } from "../types/MedicalRecord";
 import { RootStore } from "./RootStore";
 import { Attachment } from "../types/Attachment";
+import { Gender } from "../types/Gender";
 
 type State = "idle" | "pending" | "done" | "error";
 
@@ -25,17 +26,47 @@ export class ContractStore {
 
   isFetching = false;
   dashboardError = "";
-  attachmentsError = "";
-  patients: Patient[] = [];
-  isFetchingAttachments = false;
-  medicalRecords: MedicalRecord[] = [];
-  selectedPatient: Patient | null = null;
-
   isSendingRequest = false;
+
+  patients: Patient[] = [];
+  patientsFilter = "";
+  medicalRecords: MedicalRecord[] = [];
+
+  attachmentsError = "";
+  isFetchingAttachments = false;
+  selectedRecord: MedicalRecordWithIndex | null = null;
+
+  get filteredPatients() {
+    if (!this.patientsFilter) {
+      return this.patients;
+    }
+
+    return this.patients.filter(
+      (p) =>
+        p.name.includes(this.patientsFilter) ||
+        this.patientsFilter.includes(p.name)
+    );
+  }
 
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore;
     makeAutoObservable(this, {}, { autoBind: true });
+  }
+
+  getSelectedPatient(address: string) {
+    return this.patients.find((p) => p.addr == address);
+  }
+
+  setPatientsFilter = (value: string) => {
+    this.patientsFilter = value;
+  };
+
+  setSelectedRecord(record: MedicalRecord, index: number) {
+    this.selectedRecord = { ...record, index };
+  }
+
+  clearSelectedRecord() {
+    this.selectedRecord = null;
   }
 
   readonly loadBlockchainData = flow(function* (this: ContractStore) {
@@ -95,7 +126,7 @@ export class ContractStore {
     try {
       yield this.contract!.methods.registerPatient(
         patient.name,
-        parse(patient.birthdate, "dd.MM.yyyy", new Date()).getTime() / 1000,
+        parse(patient.birthDate, "dd.MM.yyyy", new Date()).getTime() / 1000,
         patient.gender
       ).send({
         from: this.account,
@@ -150,12 +181,15 @@ export class ContractStore {
         from: this.account,
       });
       this.rootStore.snackBarStore.showSnackBar("Doctor authorized", "success");
-    } catch (error) {
-      console.log(error);
-      this.rootStore.snackBarStore.showSnackBar(
-        (error as Error).message,
-        "error"
-      );
+    } catch (err) {
+      if ((err as Error).message.indexOf("Internal JSON-RPC") != -1) {
+        this.rootStore.snackBarStore.showSnackBar(
+          "Doctor already authorized",
+          "error"
+        );
+      } else {
+        this.rootStore.snackBarStore.showSnackBar("Invalid address", "error");
+      }
     } finally {
       this.isSendingRequest = false;
     }
@@ -167,7 +201,17 @@ export class ContractStore {
       const patients = yield this.contract!.methods.getPatients().call({
         from: this.account,
       });
-      this.patients = patients;
+      this.patients = (patients as Record<keyof Patient, unknown>[]).map(
+        (p) => ({
+          name: p.name as string,
+          addr: p.addr as string,
+          gender: p.gender as Gender,
+          birthDate: format(
+            new Date(Number(p.birthDate as bigint) * 1000),
+            "dd.mm.yyyy"
+          ),
+        })
+      );
     } catch (err) {
       this.dashboardError = (err as Error).message;
     } finally {
@@ -177,12 +221,13 @@ export class ContractStore {
 
   createMedicalRecord = flow(function* (
     this: ContractStore,
+    patientAddr: string,
     description: string
   ) {
     this.isSendingRequest = true;
     try {
       yield this.contract!.methods.createMedicalRecord(
-        this.selectedPatient,
+        patientAddr,
         description
       ).send({
         from: this.account,
@@ -204,18 +249,19 @@ export class ContractStore {
 
   updateMedicalRecord = flow(function* (
     this: ContractStore,
-    index: number,
+    patientAddr: string,
     description: string
   ) {
     this.isSendingRequest = true;
     try {
       yield this.contract!.methods.updateMedicalRecord(
-        this.selectedPatient,
-        index,
+        patientAddr,
+        this.selectedRecord!.index,
         description
       ).send({
         from: this.account,
       });
+      this.selectedRecord = null;
       this.rootStore.snackBarStore.showSnackBar(
         "Medical record created",
         "success"
@@ -257,11 +303,15 @@ export class ContractStore {
     }
   });
 
-  fetchRecordAttachments = flow(function* (this: ContractStore, index: number) {
+  fetchRecordAttachments = flow(function* (
+    this: ContractStore,
+    index: number,
+    patientAddr = this.account
+  ) {
     this.isFetchingAttachments = true;
     try {
       const attachments = yield this.contract!.methods.viewAttachedFiles(
-        this.selectedPatient,
+        patientAddr,
         index
       ).call({
         from: this.account,

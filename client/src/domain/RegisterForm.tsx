@@ -1,8 +1,8 @@
 import { Formik, Form } from "formik";
 import { Gender } from "../types/Gender";
 import { DateField, InputField, SelectField } from "../component/Inputs";
-import { patientFormValidation } from "./vallidators/PatientFormValidation";
-import { doctorFormValidation } from "./vallidators/DoctorFormValidation";
+import { patientFormValidation } from "./validators/PatientFormValidation";
+import { doctorFormValidation } from "./validators/DoctorFormValidation";
 import { observer } from "mobx-react";
 import { useStoreContext } from "../store";
 import { Spinner } from "../component/Loaders";
@@ -23,7 +23,7 @@ export const RegisterForm = observer(({ mode }: Props) => {
   const initialValues = {
     name: "",
     gender: Gender.Male,
-    birthdate: "",
+    birthDate: "",
   };
 
   return (
@@ -61,7 +61,7 @@ export const RegisterForm = observer(({ mode }: Props) => {
                 { label: "Other", value: Gender.Other },
               ]}
             />
-            <DateField label="Birth Date" name="birthdate" />
+            <DateField label="Birth Date" name="birthDate" />
           </>
         )}
 
