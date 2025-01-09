@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useStoreContext } from "../store";
 import { observer } from "mobx-react";
 import { MedicalRecordsList } from "../component/MedicalRecordsList/MedicalRecordsList";
@@ -6,20 +5,15 @@ import { Field, Form, Formik } from "formik";
 
 export const PatientDashboard = observer(() => {
   const {
-    contractStore: { fetchOwnMedicalRecords, authorizeDoctor },
+    contractStore: { authorizeDoctor },
     snackBarStore: { showSnackBar },
   } = useStoreContext();
-
-  useEffect(() => {
-    fetchOwnMedicalRecords();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <div className="flex h-screen">
       <main className="p-6 w-full flex flex-col">
         <div className="flex justify-between">
-          <h2 className="text-xl font-bold mb-6">Medical Records</h2>
+          <h2 className="text-3xl font-bold mb-6">Medical Records</h2>
 
           <Formik
             initialValues={{ address: "" }}

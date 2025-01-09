@@ -27,9 +27,11 @@ export class ContractStore {
   isFetching = false;
   dashboardError = "";
   isSendingRequest = false;
+  fetchPatientError = "";
+  isFetchingPatients = true;
 
-  patients: Patient[] = [];
   patientsFilter = "";
+  patients: Patient[] = [];
   medicalRecords: MedicalRecord[] = [];
 
   attachmentsError = "";
@@ -51,10 +53,6 @@ export class ContractStore {
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore;
     makeAutoObservable(this, {}, { autoBind: true });
-  }
-
-  getSelectedPatient(address: string) {
-    return this.patients.find((p) => p.addr == address);
   }
 
   setPatientsFilter = (value: string) => {
@@ -147,7 +145,18 @@ export class ContractStore {
       ).call({
         from: this.account,
       });
-      this.medicalRecords = medicalRecords;
+      this.medicalRecords = (
+        medicalRecords as Record<keyof MedicalRecord, unknown>[]
+      ).map((m) => ({
+        recordId: Number(m.recordId),
+        description: m.description as string,
+        timestamp: format(
+          new Date(Number(m.timestamp as bigint) * 1000),
+          "dd.mm.yyyy"
+        ),
+        createdBy: m.createdBy as string,
+        attachments: [],
+      }));
     } catch (err) {
       this.dashboardError = (err as Error).message;
     } finally {
@@ -166,7 +175,18 @@ export class ContractStore {
       ).call({
         from: this.account,
       });
-      this.medicalRecords = medicalRecords;
+      this.medicalRecords = (
+        medicalRecords as Record<keyof MedicalRecord, unknown>[]
+      ).map((m) => ({
+        recordId: Number(m.recordId),
+        description: m.description as string,
+        timestamp: format(
+          new Date(Number(m.timestamp as bigint) * 1000),
+          "dd.mm.yyyy"
+        ),
+        createdBy: m.createdBy as string,
+        attachments: [],
+      }));
     } catch (err) {
       this.dashboardError = (err as Error).message;
     } finally {
@@ -196,7 +216,7 @@ export class ContractStore {
   });
 
   fetchPatients = flow(function* (this: ContractStore) {
-    this.isFetching = true;
+    this.isFetchingPatients = true;
     try {
       const patients = yield this.contract!.methods.getPatients().call({
         from: this.account,
@@ -213,9 +233,9 @@ export class ContractStore {
         })
       );
     } catch (err) {
-      this.dashboardError = (err as Error).message;
+      this.fetchPatientError = (err as Error).message;
     } finally {
-      this.isFetching = false;
+      this.isFetchingPatients = false;
     }
   });
 
@@ -316,7 +336,16 @@ export class ContractStore {
       ).call({
         from: this.account,
       });
-      this.medicalRecords[index].attachments = attachments;
+      this.medicalRecords[index].attachments = (
+        attachments as Record<keyof Attachment, unknown>[]
+      ).map((a) => ({
+        fileUrl: a.fileUrl as string,
+        fileHash: a.fileHash as string,
+        timestamp: format(
+          new Date(Number(a.timestamp as bigint) * 1000),
+          "dd.mm.yyyy"
+        ),
+      }));
     } catch (err) {
       this.attachmentsError = (err as Error).message;
     } finally {

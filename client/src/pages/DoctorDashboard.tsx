@@ -1,17 +1,11 @@
-import { useEffect } from "react";
 import { useStoreContext } from "../store";
 import { PatientsList } from "../domain/PatientsList";
 import { observer } from "mobx-react";
 
 export const DoctorDashboard = observer(() => {
   const {
-    contractStore: { fetchPatients, setPatientsFilter, patientsFilter },
+    contractStore: { setPatientsFilter, patientsFilter },
   } = useStoreContext();
-
-  useEffect(() => {
-    fetchPatients();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <div className="flex h-screen">

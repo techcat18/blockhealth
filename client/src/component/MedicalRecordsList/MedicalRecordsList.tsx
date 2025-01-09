@@ -6,6 +6,9 @@ import { NoData } from "../NoData";
 import { observer } from "mobx-react";
 import { Patient } from "../../types/Patient";
 
+import editIcon from "../../img/edit.png";
+import { Attachments } from "./Attachments";
+
 interface Props {
   patient?: Patient;
 }
@@ -18,6 +21,8 @@ export const MedicalRecordsList = observer(({ patient }: Props) => {
       fetchPatientMedicalRecords,
       isFetching,
       dashboardError,
+      setSelectedRecord,
+      account,
     },
   } = useStoreContext();
 
@@ -41,47 +46,34 @@ export const MedicalRecordsList = observer(({ patient }: Props) => {
   }
 
   return (
-    <ul>
-      {medicalRecords.map((record) => (
-        <li key={record.recordId} className="mb-4 border-b pb-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h3 className="font-semibold">Record #{record.recordId}</h3>
-              <p className="text-sm text-gray-500">{record.description}</p>
-            </div>
-            <button className="text-blue-500 underline">Expand</button>
+    <ul className="container mt-4 mx-auto">
+      {medicalRecords.map((record, index) => (
+        <li
+          key={record.recordId}
+          className="border p-4 mb-4 bg-slate-50 shadow-md rounded-md"
+        >
+          <div className="flex flex-row justify-between">
+            <h2 className="text-3xl font-bold ">Record #{record.recordId}</h2>
+            {patient && (
+              <button
+                onClick={() => setSelectedRecord(record, index)}
+                className="text-blue-500 p-2 rounded-xl hover:shadow-md hover:shadow-slate-700"
+              >
+                <img src={editIcon} alt="Edit" width={30} height={30} />
+              </button>
+            )}
           </div>
+          <div className="mt-3">
+            <p className="text-xl font-medium">{record.description}</p>
+          </div>
+
+          <Attachments
+            record={{ ...record, index: index }}
+            patientAddress={patient?.addr ?? account}
+            canModify={!patient}
+          />
         </li>
       ))}
     </ul>
   );
 });
-
-/* 
-
-{true && (
-            <div className="mt-4">
-              <h4 className="font-medium">Attachments:</h4>
-              <ul className="mt-2 mb-4">
-                {(attachments[record.recordId] || []).map(
-                  (attachment, index) => (
-                    <li key={index} className="text-sm text-gray-600">
-                      <a
-                        href={attachment.fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {attachment.fileHash}
-                      </a>
-                    </li>
-                  )
-                )}
-              </ul>
-              {!patient && (
-                <button className="bg-green-500 text-white px-4 py-1 rounded">
-                  Add Attachment
-                </button>
-              )}
-            </div>
-          )}
-*/

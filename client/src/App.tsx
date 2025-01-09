@@ -13,6 +13,7 @@ import { Dots } from "./component/Loaders";
 import { PrivateRoute } from "./component/PrivateRoute";
 import { SnackBar } from "./component/SnackBar";
 import { PatientDetails } from "./pages/PatientDetails";
+import { DoctorIndex } from "./pages/DoctorIndex";
 
 export const App = observer(() => {
   const location = useLocation();
@@ -44,6 +45,10 @@ export const App = observer(() => {
     );
   }
 
+  if (state != "done") {
+    return <Dots />;
+  }
+
   return (
     <Suspense fallback={<Dots />}>
       <Routes>
@@ -63,7 +68,9 @@ export const App = observer(() => {
             <PrivateRoute
               isAllowed={userRole == "doctor"}
               redirect={location.state?.from || "/"}
-            />
+            >
+              <DoctorIndex />
+            </PrivateRoute>
           }
         >
           <Route index element={<DoctorDashboard />} />

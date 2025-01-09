@@ -15,14 +15,18 @@ const calculateAge = (birthDate: string) => {
 
 export const PatientsList = observer(() => {
   const {
-    contractStore: { isFetching, filteredPatients, dashboardError },
+    contractStore: {
+      isFetching: isFetchingPatients,
+      filteredPatients,
+      dashboardError: fetchingPatientsError,
+    },
   } = useStoreContext();
 
-  if (isFetching) {
+  if (isFetchingPatients) {
     return <Dots />;
   }
-  if (dashboardError) {
-    return <DashboardError message={dashboardError} />;
+  if (fetchingPatientsError) {
+    return <DashboardError message={fetchingPatientsError} />;
   }
   if (!filteredPatients.length) {
     return <NoData message="No patients found!" />;

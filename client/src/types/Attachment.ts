@@ -1,5 +1,5 @@
 export type Attachment = {
   fileUrl: string;
   fileHash: string;
-  timestamp: number;
+  timestamp: string;
 };

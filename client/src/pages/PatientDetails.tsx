@@ -5,26 +5,31 @@ import { MedicalRecordsList } from "../component/MedicalRecordsList/MedicalRecor
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import arrow from "../img/arrow.png";
 import { MedicalReportModal } from "../domain/MedicalReportModal";
+import { Dots } from "../component/Loaders";
 
 export const PatientDetails = observer(() => {
   const navigate = useNavigate();
   const { address } = useParams();
   const {
     contractStore: {
-      fetchPatientMedicalRecords,
-      getSelectedPatient,
+      patients,
       selectedRecord,
       clearSelectedRecord,
+      isFetchingPatients,
     },
   } = useStoreContext();
-  const selectedPatient = getSelectedPatient(address!);
+  const selectedPatient = patients.find((p) => p.addr == address);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    fetchPatientMedicalRecords(address!);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (selectedRecord) {
+      setIsModalOpen(true);
+    }
+  }, [selectedRecord]);
 
+  if (isFetchingPatients) {
+    return <Dots />;
+  }
   if (!selectedPatient) {
     return <Navigate to="/" />;
   }
@@ -32,7 +37,7 @@ export const PatientDetails = observer(() => {
   return (
     <div className="flex h-screen">
       <main className="p-6 w-full flex flex-col">
-        <div className="flex flex-row items-center px-4 mt-3 mb-6">
+        <div className="flex flex-row items-center justify-between px-4 mt-3 mb-6">
           <button
             onClick={() => navigate(-1)}
             className="flex items-center justify-center p-2 rounded-full shadow-sm hover:bg-zinc-50 duration-100"
@@ -40,17 +45,17 @@ export const PatientDetails = observer(() => {
             <img src={arrow} alt="Go Back" width={42} height={42} />
           </button>
 
-          <h2 className="text-4xl pl-32 mx-auto font-bold">
-            Viewing medical records of patient {selectedPatient.name}
-          </h2>
-
           <button
             onClick={() => setIsModalOpen(true)}
             className="bg-blue-500 text-white w-40 px-4 py-2 rounded hover:bg-blue-800"
           >
-            Add Report
+            Add Record
           </button>
         </div>
+
+        <h1 className="text-4xl text-center font-bold mb-6">
+          {selectedPatient.name} Medical Records
+        </h1>
 
         <MedicalRecordsList patient={selectedPatient} />
       </main>
