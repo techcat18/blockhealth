@@ -6,6 +6,7 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 import arrow from "../img/arrow.png";
 import { MedicalReportModal } from "../domain/MedicalReportModal";
 import { Dots } from "../component/Loaders";
+import { MedicalRecord } from "../types/MedicalRecord";
 
 export const PatientDetails = observer(() => {
   const navigate = useNavigate();
@@ -13,13 +14,41 @@ export const PatientDetails = observer(() => {
   const {
     contractStore: {
       patients,
+      contract,
       selectedRecord,
       clearSelectedRecord,
+      onMedicalRecordCreated,
+      onMedicalRecordUpdated,
       isFetchingPatients,
     },
   } = useStoreContext();
   const selectedPatient = patients.find((p) => p.addr == address);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    console.log("effect");
+    const onCreateSubscription = contract?.events["MedicalRecordCreated"]({});
+    onCreateSubscription?.on("data", (data) => {
+      onMedicalRecordCreated({
+        ...(data.returnValues as MedicalRecord),
+        recordId: Number(data.returnValues["recordId"]),
+      });
+    });
+    const onUpdateSubscription = contract?.events["MedicalRecordUpdated"]({});
+    onUpdateSubscription?.on("data", (data) => {
+      onMedicalRecordUpdated({
+        ...(data.returnValues as MedicalRecord),
+        recordId: Number(data.returnValues["recordId"]),
+        description: data.returnValues["newDescription"] as string,
+      });
+    });
+
+    return () => {
+      onCreateSubscription?.removeAllListeners();
+      onUpdateSubscription?.removeAllListeners();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (selectedRecord) {

@@ -2,12 +2,30 @@ import { useStoreContext } from "../store";
 import { observer } from "mobx-react";
 import { MedicalRecordsList } from "../component/MedicalRecordsList/MedicalRecordsList";
 import { Field, Form, Formik } from "formik";
+import { useEffect } from "react";
+import { Attachment } from "../types/Attachment";
 
 export const PatientDashboard = observer(() => {
   const {
-    contractStore: { authorizeDoctor },
+    contractStore: { contract, authorizeDoctor, onAttachmentAdded },
     snackBarStore: { showSnackBar },
   } = useStoreContext();
+
+  useEffect(() => {
+    console.log("effect");
+    const subscription = contract?.events["AttachmentAdded"]({});
+    subscription?.on("data", (data) =>
+      onAttachmentAdded(
+        Number(data.returnValues["recordId"]),
+        data.returnValues as Attachment
+      )
+    );
+
+    return () => {
+      subscription?.removeAllListeners();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="flex h-screen">

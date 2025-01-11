@@ -239,6 +239,16 @@ export class ContractStore {
     }
   });
 
+  onMedicalRecordCreated = (medicalRecord: MedicalRecord) => {
+    this.medicalRecords = [...this.medicalRecords, medicalRecord];
+  };
+
+  onMedicalRecordUpdated = (medicalRecord: MedicalRecord) => {
+    this.medicalRecords = this.medicalRecords.map((r) =>
+      r.recordId == medicalRecord.recordId ? medicalRecord : r
+    );
+  };
+
   createMedicalRecord = flow(function* (
     this: ContractStore,
     patientAddr: string,
@@ -283,8 +293,8 @@ export class ContractStore {
       });
       this.selectedRecord = null;
       this.rootStore.snackBarStore.showSnackBar(
-        "Medical record created",
-        "success"
+        "Medical record updated",
+        "info"
       );
     } catch (error) {
       console.log(error);
@@ -296,6 +306,14 @@ export class ContractStore {
       this.isSendingRequest = false;
     }
   });
+
+  onAttachmentAdded = (recordId: number, attachment: Attachment) => {
+    this.medicalRecords = this.medicalRecords.map((r) =>
+      r.recordId == recordId
+        ? { ...r, attachments: [...r.attachments, attachment] }
+        : r
+    );
+  };
 
   addAttachmentToRecord = flow(function* (
     this: ContractStore,

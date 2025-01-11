@@ -5,7 +5,7 @@ import { Gender } from "../../types/Gender";
 export const patientFormValidation = Yup.object({
   name: Yup.string().required("Required field"),
   gender: Yup.mixed<Gender>().oneOf(Object.values(Gender) as Gender[]),
-  birthdate: Yup.date()
+  birthDate: Yup.date()
     .required("Required field")
     .transform(function (value, originalValue) {
       if (this.isType(value)) {
